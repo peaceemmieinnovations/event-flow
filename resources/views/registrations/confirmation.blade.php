@@ -1,0 +1,3 @@
+@extends('layouts.app')
+@section('title','Registration successful')
+@section('content')<section class="ef-auth"><div class="ef-container"><div class="ef-auth__intro"><p class="ef-eyebrow">Registration successful</p><h1 class="ef-heading-xl">You’re on the list.</h1><p class="ef-lead">{{ $registration->first_name }}, your registration for {{ $registration->event->title }} has been received.</p><p class="ef-body">Registration ID: <strong>{{ $registration->reference }}</strong></p><p class="ef-body">{{ $registration->event->event_date->format('M j, Y') }} · {{ $registration->event->location }}</p><x-ui.button :href="route('events.show',$registration->event)">Back to event</x-ui.button></div></div></section>@endsection
