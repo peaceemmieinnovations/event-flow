@@ -54,6 +54,10 @@
         "lint": [
             "pint --parallel"
         ],
+        "serve": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
+            "@php artisan serve --port=8100"
+        ],
         "lint:check": [
             "pint --parallel --test"
         ],

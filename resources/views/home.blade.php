@@ -32,7 +32,7 @@
                 <p class="ef-hero__copy" data-hero-copy data-reveal>Discover unforgettable events, connect with your city, and make plans that become memories.</p>
                 <div class="ef-hero__actions" data-hero-actions data-reveal>
                     <x-ui.button :href="route('events.index')" :magnetic="true">Explore Events</x-ui.button>
-                    <span class="ef-button ef-button--secondary ef-button--unavailable" aria-disabled="true">Create an Event</span>
+                    <x-ui.button variant="secondary" :href="auth()->check() ? route('host.events.create') : route('register')">Create an Event</x-ui.button>
                 </div>
             </div>
 

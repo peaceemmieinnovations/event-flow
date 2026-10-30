@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -16,5 +15,11 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(SuperAdminSeeder::class);
+
+        // Sample events, attendees and payments are only for local work. They
+        // are never planted on a production database.
+        if (app()->environment('local')) {
+            $this->call(DemoSeeder::class);
+        }
     }
 }

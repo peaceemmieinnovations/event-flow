@@ -140,6 +140,32 @@
                     </aside>
                 @endif
 
+                @if (filled($relatedEvents) && $relatedEvents->isNotEmpty())
+                    <section class="ef-event-detail__related" data-event-detail-related aria-labelledby="event-related-title">
+                        <header class="ef-event-detail__related-header">
+                            <p class="ef-eyebrow">Keep exploring</p>
+                            <h2 class="ef-heading-lg" id="event-related-title">More events for you</h2>
+                        </header>
+
+                        <ol class="ef-event-detail__related-grid{{ $relatedEvents->count() === 1 ? ' ef-event-detail__related-grid--single' : ($relatedEvents->count() === 2 ? ' ef-event-detail__related-grid--pair' : '') }}">
+                            @foreach ($relatedEvents as $related)
+                                <li class="ef-event-detail__related-item">
+                                    <x-event-card
+                                        :event="$related"
+                                        :category="$related->categoryLabel()"
+                                        :price="$related->priceLabel()"
+                                        data-event-related-card
+                                    />
+                                </li>
+                            @endforeach
+                        </ol>
+
+                        <p class="ef-event-detail__related-more">
+                            <x-ui.button variant="secondary" :href="route('events.index')">Browse all events</x-ui.button>
+                        </p>
+                    </section>
+                @endif
+
                 <footer class="ef-event-detail__footer" data-event-detail-footer>
                     <a class="ef-link" href="{{ route('events.index') }}">Back to all events</a>
                 </footer>

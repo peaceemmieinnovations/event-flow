@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
@@ -28,12 +28,22 @@ use Illuminate\Support\Str;
 class User extends Authenticatable
 {
     public const ROLE_SUPER_ADMIN = 'super_admin';
+
     public const ROLE_ADMIN = 'admin';
+
     public const ROLE_ORGANIZER = 'organizer';
+
     public const ROLE_ATTENDEE = 'attendee';
 
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
+
+    /**
+     * Roles that may operate the EventFlow admin area.
+     *
+     * @var list<string>
+     */
+    public const STAFF_ROLES = [self::ROLE_ADMIN, self::ROLE_ORGANIZER];
 
     /**
      * Get the attributes that should be cast.
@@ -48,13 +58,13 @@ class User extends Authenticatable
         ];
     }
 
-    /** @param  string|list<string>  $roles */
+    /** @param  string|array<int|string, string>  $roles */
     public function hasRole(string|array $roles): bool
     {
         return in_array($this->role, (array) $roles, true);
     }
 
-    /** @param  list<string>  $roles */
+    /** @param  array<int|string, string>  $roles */
     public function hasAnyRole(array $roles): bool
     {
         return $this->isSuperAdmin() || $this->hasRole($roles);
@@ -63,6 +73,34 @@ class User extends Authenticatable
     public function isSuperAdmin(): bool
     {
         return $this->hasRole(self::ROLE_SUPER_ADMIN);
+    }
+
+    /**
+     * Whether this account may reach /admin.
+     */
+    public function isStaff(): bool
+    {
+        return $this->hasAnyRole(self::STAFF_ROLES);
+    }
+
+    public function roleLabel(): string
+    {
+        return match ($this->role) {
+            self::ROLE_SUPER_ADMIN => 'Super Admin',
+            self::ROLE_ADMIN => 'Administrator',
+            self::ROLE_ORGANIZER => 'Organizer',
+            default => 'Attendee',
+        };
+    }
+
+    /**
+     * Attendee-facing registrations identified by email.
+     *
+     * @return HasMany<Registration, $this>
+     */
+    public function registrations(): HasMany
+    {
+        return $this->hasMany(Registration::class, 'email', 'email');
     }
 
     /**
@@ -75,5 +113,11 @@ class User extends Authenticatable
         return Str::length($initials) > 1
             ? Str::substr($initials, 0, 1).Str::substr($initials, -1)
             : $initials;
+    }
+
+    /** @return HasMany<Event, $this> */
+    public function hostedEvents(): HasMany
+    {
+        return $this->hasMany(Event::class);
     }
 }
